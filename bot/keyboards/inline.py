@@ -49,22 +49,32 @@ async def kb_teacher():
    return keyboard
 
 async def kb_subjects(page=1):
-    keyboard = InlineKeyboardMarkup()
-    kb = []
-    list = await db.get_all_subjects(page)
-    for btn in list:
-        keyboard.add(InlineKeyboardButton(btn['name'], callback_data=f"teacher:{btn['id']}"))
-    if page > 1:
-        kb.append(InlineKeyboardButton("◀️ Предыдущая", callback_data=f"prev_page:{page - 1}"))
-    if len(list) == 10:
-        kb.append(InlineKeyboardButton("▶️ Следующая", callback_data=f"next_page:{page + 1}"))
-    keyboard.add(*kb)
-    list_kb = [
-        InlineKeyboardButton("➕ Добавить предмет", callback_data=f"add_subjects"),
-        InlineKeyboardButton("🔍 Поиск", callback_data=f"search_subject"),
-        InlineKeyboardButton("🔙 Главное меню", callback_data="back_to_main_menu")
-    ]
-    keyboard.add(list_kb[0], list_kb[1])
-    keyboard.add(list_kb[2])
+   keyboard = InlineKeyboardMarkup()
+   kb = []
+   list = await db.get_all_subjects(page)
+   for btn in list:
+      keyboard.add(InlineKeyboardButton(btn['name'], callback_data=f"teacher:{btn['id']}"))
+   if page > 1:
+      kb.append(InlineKeyboardButton("◀️ Предыдущая", callback_data=f"prev_page:{page - 1}"))
+   if len(list) == 10:
+      kb.append(InlineKeyboardButton("▶️ Следующая", callback_data=f"next_page:{page + 1}"))
+   keyboard.add(*kb)
+   list_kb = [
+      InlineKeyboardButton("➕ Добавить предмет", callback_data=f"add_subjects"),
+      InlineKeyboardButton("🔍 Поиск", callback_data=f"search_subject"),
+      InlineKeyboardButton("🔙 Главное меню", callback_data="back_to_main_menu")
+   ]
+   keyboard.add(list_kb[0], list_kb[1])
+   keyboard.add(list_kb[2])
 
-    return keyboard
+   return keyboard
+ 
+#Поиск
+async def seach_list_kb(table, word):
+   kb = InlineKeyboardMarkup()
+   list = await db.search_by_word(table=table, word=word)
+   for btn in list:
+      kb.add(InlineKeyboardButton(f"{btn['name']}", callback_data=f"one_{table}:{btn['id']}"))
+   kb.add(InlineKeyboardButton("Назад", callback_data=f"back_to_main_menu"))
+
+   return kb

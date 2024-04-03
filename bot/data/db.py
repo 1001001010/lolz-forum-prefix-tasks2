@@ -26,6 +26,12 @@ class DB(AsyncClass):
         await self.con.execute(f"INSERT INTO subjects(name) VALUES (?)", (name,))
         await self.con.commit()
     
+    # Поиск по ключевому слову
+    async def search_by_word(self, table, word):
+        search_word = f"%{word}%"
+        row = await self.con.execute(f"SELECT * FROM {table} WHERE name LIKE ?", (search_word,))
+        return await row.fetchall()
+    
     #Проверка на существование бд и ее создание
     async def create_db(self):
         classrooms_info = await self.con.execute("PRAGMA table_info(classrooms)")
