@@ -1,8 +1,8 @@
 import colorama
 import asyncio
 import logging
+from aiogram import executor, Dispatcher, bot
 
-from aiogram import executor, Dispatcher
 from bot.handlers import dp
 from bot.data.config import db
 from bot.data.loader import scheduler

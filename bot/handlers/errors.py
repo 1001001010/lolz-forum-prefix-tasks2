@@ -1,5 +1,4 @@
 import logging
-
 from aiogram.types import Update
 from aiogram.utils.exceptions import (Unauthorized, InvalidQueryID, TelegramAPIError, UserDeactivated,
                                       CantDemoteChatCreator, MessageNotModified, MessageToDeleteNotFound,

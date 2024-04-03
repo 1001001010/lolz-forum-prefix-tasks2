@@ -10,6 +10,22 @@ class DB(AsyncClass):
         self.con = await aiosqlite.connect(path_db)
         self.con.row_factory = aiosqlite.Row
 
+    #Получение всех преподавателей
+    async def get_all_teachers(self):
+        row = await self.con.execute("SELECT * FROM teachers")
+        return await row.fetchall()
+
+    #Получение списка всех предметов
+    async def get_all_subjects(self, page):
+        offset = (page - 1) * 10
+        row = await self.con.execute("SELECT * FROM subjects LIMIT 10 OFFSET ?", (offset,))
+        return await row.fetchall()
+    
+    # Добавление нового предмета
+    async def new_genre(self, name):
+        await self.con.execute(f"INSERT INTO subjects(name) VALUES (?)", (name,))
+        await self.con.commit()
+    
     #Проверка на существование бд и ее создание
     async def create_db(self):
         classrooms_info = await self.con.execute("PRAGMA table_info(classrooms)")
@@ -25,23 +41,23 @@ class DB(AsyncClass):
             print("database was not found (classrooms | 1/4), creating...")
     
         teachers_info = await self.con.execute("PRAGMA table_info(teachers)")
-        if len(await teachers_info.fetchall()) == 3:
+        if len(await teachers_info.fetchall()) == 4:
             print("database was found (Teachers | 2/4)")
         else:
             await self.con.execute("CREATE TABLE teachers("
                                    "id INTEGER PRIMARY KEY AUTOINCREMENT,"
                                    "name TEXT,"
-                                   "subject TEXT)")
+                                   "subject TEXT,"
+                                   "status BOOLEAN DEFAULT 1)")
             print("database was not found (Teachers | 2/4), creating...")
         
         subjects_info = await self.con.execute("PRAGMA table_info(subjects)")
-        if len(await subjects_info.fetchall()) == 3:
+        if len(await subjects_info.fetchall()) == 2:
             print("database was found (Subjects | 3/4)")
         else:
             await self.con.execute("CREATE TABLE subjects("
                                    "id INTEGER PRIMARY KEY AUTOINCREMENT,"
-                                   "name TEXT,"
-                                   "link TEXT)")
+                                   "name TEXT)")
             print("database was not found (Subjects | 3/4), creating...")
             
         schedule_info = await self.con.execute("PRAGMA table_info(schedule)")

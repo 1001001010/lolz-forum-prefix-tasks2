@@ -1,7 +1,8 @@
 # - *- coding: utf- 8 - *-
 import configparser
-from bot.data.db import DB
 import asyncio
+
+from bot.data.db import DB
 
 # Создание экземпляра бд 
 async def main_db():
