@@ -1,6 +1,14 @@
 import aiosqlite
 from async_class import AsyncClass
 
+def dict_factory(cursor, row):
+    save_dict = {}
+
+    for idx, col in enumerate(cursor.description):
+        save_dict[col[0]] = row[idx]
+
+    return save_dict
+
 #Путь до БД
 path_db = 'bot/data/database.db'
 
@@ -8,7 +16,7 @@ path_db = 'bot/data/database.db'
 class DB(AsyncClass):
     async def __ainit__(self):
         self.con = await aiosqlite.connect(path_db)
-        self.con.row_factory = aiosqlite.Row
+        self.con.row_factory = dict_factory
 
     #Получение всех преподавателей
     async def get_all_teachers(self):
@@ -21,9 +29,29 @@ class DB(AsyncClass):
         row = await self.con.execute("SELECT * FROM subjects LIMIT 10 OFFSET ?", (offset,))
         return await row.fetchall()
     
+    #Получение инфо о преподавателе
+    async def get_teacher_info(self, id):
+        row = await self.con.execute("SELECT * FROM teachers WHERE id = ?", (id,))
+        return await row.fetchone()
+    
+    #Получение инфо о предмете
+    async def get_subject_info(self, subj_id):
+        row = await self.con.execute("SELECT name FROM subjects WHERE id = ?", (subj_id,))
+        return await row.fetchone()
+    
     # Добавление нового предмета
     async def new_genre(self, name):
         await self.con.execute(f"INSERT INTO subjects(name) VALUES (?)", (name,))
+        await self.con.commit()
+    
+    #Увольнение/Принятие на работу преподавателя
+    async def dismis_teacher(self, id, status):
+        await self.con.execute("UPDATE teachers SET status = ? WHERE id = ?", (status, id))
+        await self.con.commit()
+    
+    # Добавление нового преподавателя
+    async def new_prepod(self, name, subject, status):
+        await self.con.execute(f"INSERT INTO teachers(name, subject, status) VALUES (?, ?, ?)", (name, subject, status))
         await self.con.commit()
     
     # Поиск по ключевому слову
