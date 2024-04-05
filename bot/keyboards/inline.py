@@ -102,9 +102,21 @@ async def kb_subjects_for_prep(page=1):
 
 def kb_date():
    kb = InlineKeyboardMarkup()
-   kb.add(InlineKeyboardButton(f"{get_date('today')}", callback_data=f"data"))
-   kb.add(InlineKeyboardButton(f"{get_date('tomorrow')}", callback_data=f"data"))
-   kb.add(InlineKeyboardButton(f"{get_date('after_tomorrow')}", callback_data=f"data"))
+   kb.add(InlineKeyboardButton(f"{get_date('today')}", callback_data=f"date_{get_date('today')}"))
+   kb.add(InlineKeyboardButton(f"{get_date('tomorrow')}", callback_data=f"date_{get_date('tomorrow')}"))
+   kb.add(InlineKeyboardButton(f"{get_date('after_tomorrow')}", callback_data=f"date_{get_date('after_tomorrow')}"))
    kb.add(InlineKeyboardButton("Назад", callback_data=f"back_to_main_menu"))
-
    return kb
+
+async def kb_shedule(date):
+   keyboard = InlineKeyboardMarkup()
+   kb = []
+   list = await db.get_shedule(date)
+   for btn in list:
+      subj = await db.get_subject_info(btn['subject_id'])
+      keyboard.add(InlineKeyboardButton(f"{subj['name']} | Каб. {btn['classroom_id']}", callback_data=f"shedule:{btn['id']}"))
+   kb.append(InlineKeyboardButton("➕ Назначить урок", callback_data="add_shedule"))
+   kb.append(InlineKeyboardButton("🔙 Назад", callback_data="back_to_main_menu"))
+   keyboard.add(kb[1], kb[0])
+   
+   return keyboard

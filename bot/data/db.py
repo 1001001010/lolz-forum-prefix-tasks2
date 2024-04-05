@@ -39,6 +39,11 @@ class DB(AsyncClass):
         row = await self.con.execute("SELECT name FROM subjects WHERE id = ?", (subj_id,))
         return await row.fetchone()
     
+    #Получение расписания на n-число
+    async def get_shedule(self, id):
+        row = await self.con.execute("SELECT * FROM schedule WHERE date = ?", (id,))
+        return await row.fetchall()
+        
     # Добавление нового предмета
     async def new_genre(self, name):
         await self.con.execute(f"INSERT INTO subjects(name) VALUES (?)", (name,))
